@@ -1,91 +1,137 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import logo from "./logo.svg";
 import "./App.css";
 
 function App() {
-  const Person = {
-    name: "david",
-    age: 30,
-  };
+  const names = ["johnny", "phelps", "kyle", "cook"];
 
-  const personStyle = {
-    color: "blue",
-    backgroundColor: "yellow",
-  };
-
-  const Subscribers = ["ReaganFoxx", "Arnold", "Megan"];
-
-  const Products = [
-    { name: "Adobe Photoshop", price: "&60" },
-    { name: "Illustrator", price: "$50" },
-    { name: "Acrobat Reader", price: "$40" },
+  const products = [
+    { name: "shoe", price: "$100" },
+    { name: "backpack", price: "$80" },
+    { name: "sweter", price: "$70" },
   ];
+
+  const style = {
+    color: "yellow",
+  };
+
+  // Api Call
+  const [users, setUsers] = useState([]);
+  useEffect(() => {
+    fetch("http://jsonplaceholder.typicode.com/users")
+      .then((response) => response.json())
+      .then((data) => setUsers(data));
+  }, []);
 
   return (
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <p style={personStyle}>
-          Howdy! I am {Person.name}, I am {Person.age} years old
-        </p>
-        <User name="Roger" age="40"></User>
-        <h2>Subscribers</h2>
-        <ul>
-          {Subscribers.map((subscriber) => (
-            <li>{subscriber}</li>
+        <ul style={{ color: "red" }}>
+          {names.map((name) => (
+            <li key={name}>{name}</li>
           ))}
         </ul>
-        <ul>
-          {Products.map((product) => (
-            <li>{product.name}</li>
+        <ul style={style}>
+          {products.map((product) => (
+            <li key={product.name}>
+              {product.name} {product.price}
+            </li>
           ))}
         </ul>
-        {Products.map((pd) => (
-          <Product product={pd}></Product>
+        <Products product={products[0]}></Products>
+        <Products product={products[1]}></Products>
+        <Products product={products[2]}></Products>
+        {users.map((element) => (
+          <Users
+            name={element.name}
+            key={element.id}
+            email={element.email}
+          ></Users>
         ))}
-        <Product product={Products[0]}></Product>
-        <Product product={Products[1]}></Product>
+        <RandomUsers></RandomUsers>
       </header>
     </div>
   );
 }
 
-const User = (props) => {
-  const userStyle = {
-    color: "green",
-    border: "2px solid red",
+const Products = (props) => {
+  const productStyle = {
+    backgroundColor: "lightpink",
+    color: "black",
+    width: "300px",
+    // height: "200px",
+    margin: "10px",
+    padding: "5px",
     borderRadius: "10px",
-    margin: "4px",
+    border: "2px solid red",
   };
+
+  const { name, price } = props.product;
+
   return (
-    <div style={userStyle}>
-      <h1>Name: {props.name}</h1>
-      <h2>Age: {props.age}</h2>
+    <div style={productStyle}>
+      <h3>Name: {name}</h3>
+      <h4>Price: {price}</h4>
+      <Counter></Counter>
     </div>
   );
 };
 
-const Product = (props) => {
-  const productStyle = {
-    color: "black",
-    backgroundColor: "lightgray",
-    border: "1px solid red",
-    borderRadius: "10px",
-    height: "200px",
-    width: "200px",
-    // float: "left",
-    fontSize: "0.8rem",
-  };
-  const { name, price } = props.product;
+// State Declaration
+const Counter = () => {
+  const [count, setCount] = useState(0);
   return (
-    <div style={productStyle}>
-      <h1>Name: {name}</h1>
-      <h2>Price: {price}</h2>
-      <button type="submit">Submit</button>
+    <>
+      <h3>Quantity: {count}</h3>
+      <button onClick={() => setCount(count + 1)}>Increase</button>
+      <button onClick={() => setCount(count - 1)}>Decrease</button>
+    </>
+  );
+};
+
+//Api Call from jsonplaceholder.com
+const Users = (props) => {
+  return (
+    <div>
+      <h2>Users name here: {props.name}</h2>
+      <h2>Email here: {props.email}</h2>
     </div>
+  );
+};
+
+// Api call from randomusers.com
+const RandomUsers = () => {
+  const style = {
+    backgroundColor: "green",
+    color: "yellow",
+    margin: "10px",
+    padding: "5px",
+    border: "2px solid red",
+    borderRadius: "10px",
+    width: "200px",
+    height: "200px",
+  };
+  const [items, setItems] = useState([]);
+
+  useEffect(() => {
+    fetch("https://randomuser.me/api/?results=10")
+      .then((response) => response.json())
+      .then((data) => setItems(data.results));
+  }, []);
+
+  return (
+    <>
+      {items.map((item) => (
+        <div style={style} key={item.name.first}>
+          <h3>Name: {item.name.first}</h3>
+          <h3>
+            Image: <img src="{item.picture.thumbnail}" alt="" />
+          </h3>
+          <h3>Age: {item.dob.age}</h3>
+        </div>
+      ))}
+    </>
   );
 };
 
